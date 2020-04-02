@@ -6,6 +6,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import javafx.stage.DirectoryChooser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +41,12 @@ public class Controller {
 
   private List<String> resultFile;
 
+  private Document document;
+
+  private File fileTemp;
+
   @FXML
   public void initialize() {
-
   }
 
   @FXML
@@ -49,35 +56,55 @@ public class Controller {
     directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
     selectedDirectory = directoryChooser.showDialog(null);
     textFieldPath.setText(selectedDirectory.getAbsolutePath());
-
   }
 
   @FXML
   public void onClickGenerate() {
-   search();
+    search();
   }
 
-  public void search(){
+  public void search() {
     try (Stream<Path> walk = Files.walk(Paths.get(selectedDirectory.getAbsolutePath()))) {
-
       resultDirecotry = walk.filter(Files::isDirectory)
         .map(x -> x.toString()).collect(Collectors.toList());
-
-      resultDirecotry.forEach(System.out::println);
       resultDirecotry.forEach(x -> {
         try (Stream<Path> walkFile = Files.walk(Paths.get(x))) {
-
           resultFile = walkFile.map(y -> y.toString())
-            .filter(f -> f.endsWith(".xlsx")).collect(Collectors.toList());
-          resultFile.forEach(System.out::println);
-        }catch (IOException e) {
+            .filter(f -> f.endsWith(".html")).collect(Collectors.toList());
+          read(resultFile);
+        } catch (IOException e) {
           e.printStackTrace();
         }
       });
-
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
+  public void read(List<String> resultFile) throws IOException {
+    if (resultFile.size() <= 6) {
+      for (int i = 0; i < resultFile.size(); i++) {
+        fileTemp = new File(resultFile.get(i));
+        document = Jsoup.parse(fileTemp, "UTF-8");
+        if (i == 1) {
+          Element table = document.select("table").get(6);
+          Elements rows = table.select("tr");
+          Elements cols = null;
+          for (int j = 0; j < rows.size(); j++) {
+            cols = rows.get(j).select("td");
+            // System.out.println(cols.get(0).toString());
+            if (cols.get(0).text().equals("7. Odłączenie")) {
+              if (!cols.get(5).text().equals("/ /")) {
+                System.out.println(cols.get(5).text());
+                Elements temp = rows.get(j + 1).select("td");
+                System.out.println(rows.get(j + 1).select("td").get(4).text());
+              }
+            }
+          }
+        }
+      }
+    } else {
+    }
+  }
 }
+
