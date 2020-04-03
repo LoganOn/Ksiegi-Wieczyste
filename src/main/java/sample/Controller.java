@@ -92,6 +92,8 @@ public class Controller {
           Elements cols = null;
           for (int j = 0; j < rows.size(); j++) {
             cols = rows.get(j).select("td");
+            if(cols.hasClass("csMark"))
+              System.out.println(cols.get(cols.size()-1).text());
             // System.out.println(cols.get(0).toString());
             if (cols.get(0).text().equals("7. Odłączenie")) {
               if (!cols.get(5).text().equals("/ /")) {
