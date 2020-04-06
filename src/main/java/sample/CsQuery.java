@@ -41,9 +41,11 @@ public class CsQuery {
 
   public void GetKWFields13(Document document) {
     setTable(document, 14);
-    for (int j = 5; j < rows.size(); j++) {
+    for (int j = 0; j < rows.size(); j++) {
+      if(j==5){
       cols = rows.get(j).select("td");
       System.out.println(cols.get(4).text());
+      }
     }
   }
 
@@ -53,7 +55,8 @@ public class CsQuery {
       cols = rows.get(j).select("td");
       if (cols.get(0).text().equals("7. Odłączenie")) {
         if (!cols.get(5).text().equals("/ /")) {
-          System.out.println(rows.get(j - 6).select("td").get(4).text());
+          Elements temp = rows.get(j - 6).select("td");
+          System.out.println(temp.get(temp.size() - 1).text());
           System.out.println(cols.get(cols.size() - 1).text());
           System.out.println(rows.get(j + 1).select("td").get(4).text());
         }
