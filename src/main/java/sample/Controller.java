@@ -45,8 +45,11 @@ public class Controller {
 
   private File fileTemp;
 
+  private CsQuery csQuery = null;
+
   @FXML
   public void initialize() {
+    csQuery = new CsQuery();
   }
 
   @FXML
@@ -86,23 +89,16 @@ public class Controller {
       for (int i = 0; i < resultFile.size(); i++) {
         fileTemp = new File(resultFile.get(i));
         document = Jsoup.parse(fileTemp, "UTF-8");
+        if(i == 0)
+        {
+          csQuery.GetKWFields2(document);
+        }
         if (i == 1) {
-          Element table = document.select("table").get(6);
-          Elements rows = table.select("tr");
-          Elements cols = null;
-          for (int j = 0; j < rows.size(); j++) {
-            cols = rows.get(j).select("td");
-            if(cols.hasClass("csMark"))
-              System.out.println(cols.get(cols.size()-1).text());
-            // System.out.println(cols.get(0).toString());
-            if (cols.get(0).text().equals("7. Odłączenie")) {
-              if (!cols.get(5).text().equals("/ /")) {
-                System.out.println(cols.get(5).text());
-                Elements temp = rows.get(j + 1).select("td");
-                System.out.println(rows.get(j + 1).select("td").get(4).text());
-              }
-            }
-          }
+          csQuery.GetKWFields3(document);
+          csQuery.GetKWFields5(document);
+          csQuery.GetKWFields14(document);
+          csQuery.GetKWFields13(document);
+
         }
       }
     } else {
