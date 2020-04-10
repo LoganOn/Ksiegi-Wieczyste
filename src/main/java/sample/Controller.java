@@ -11,11 +11,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,6 +48,10 @@ public class Controller {
 
   private CsQuery csQuery = null;
 
+  private PrintWriter writer;
+
+  private String nameFile;
+
   @FXML
   public void initialize() {
     csQuery = new CsQuery();
@@ -63,7 +68,18 @@ public class Controller {
 
   @FXML
   public void onClickGenerate() {
+    Date date = new Date();
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
+    nameFile = "React-Client-" + formatter.format(date) +".csv";
+    try {
+      writer = new PrintWriter(nameFile, "UTF-8");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
     search();
+    writer.close();
   }
 
   public void search() {
@@ -85,25 +101,52 @@ public class Controller {
   }
 
   public void read(List<String> resultFile) throws IOException {
-    if (resultFile.size() <= 6) {
+    KW kw = new KW();
+    if (resultFile.size() == 6) {
       for (int i = 0; i < resultFile.size(); i++) {
         fileTemp = new File(resultFile.get(i));
         document = Jsoup.parse(fileTemp, "UTF-8");
         if(i == 0)
         {
-          csQuery.GetKWFields2(document);
+          csQuery.GetKWFields1(kw);
+          kw.setField2(csQuery.GetKWFields2(document));
         }
         if (i == 1) {
-          csQuery.GetKWFields3(document);
-          csQuery.GetKWFields5(document);
+          kw.setField3(csQuery.GetKWFields3(document));
+          kw.setField5(csQuery.GetKWFields5(document));
+          //kw.setField6(csQuery.GetKWFields6(document));
+          csQuery.GetKWFields6(document);
+          csQuery.GetKWFields7(document);
+          csQuery.GetKWFields8(document);
+          csQuery.GetKWFields15(document);
           csQuery.GetKWFields14(document);
           csQuery.GetKWFields13(document);
-
         }
-        System.out.println("######################################################################");
+        if(i == 2){
+          csQuery.GetKWFields11(document);
+        }
+        if(i == 3){
+          csQuery.GetKWFields9(document);
+          csQuery.GetKWFields10(document);
+        }
+        if(i == 4){
+          csQuery.GetKWFields12(document);
+        }
       }
+      System.out.println("######################################################################");
     } else {
+      System.out.println("**********************************************************************");
+      System.out.println("Za krotki");
+      System.out.println("**********************************************************************");
     }
+    writer.print(kw.getField1() + ";");
+    writer.print(kw.getField2() + ";");
+    writer.print(kw.getField3() + ";");
+    writer.println(kw.getField5() + ";");
+  }
+
+  public void write(String s){
+
   }
 }
 
