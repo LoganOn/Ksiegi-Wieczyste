@@ -24,7 +24,7 @@
             <children>
                 <HBox prefHeight="100.0" prefWidth="200.0">
                     <children>
-                        <Label fx:id="labelText" text="Wskaż folder z plikami ....">
+                        <Label fx:id="labelText" text="Wybierz folder z plikami">
                             <HBox.margin>
                                 <Insets left="10.0" top="20.0" />
                             </HBox.margin>

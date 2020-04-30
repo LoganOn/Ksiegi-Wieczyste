@@ -52,6 +52,8 @@ public class Controller {
 
   private String nameFile;
 
+  private String header = "Lp.;Numer KW;Numery działek;Pola powierzchni;Pola powierzchni;Położenie nieruchomości;Rodzaj nieruchomości;Informacje o mapach;Właściciele;Podstawy ustalenia danych w kol 8;Rodzaj ograniczeń praw rzeczowych;Uwagi;Inne-Uwagi do migracji;Przyłączenie z KW;Odłączenie z KW";
+
   @FXML
   public void initialize() {
     csQuery = new CsQuery();
@@ -59,6 +61,7 @@ public class Controller {
 
   @FXML
   public void onClickChoose() {
+    labelText.setText("Wybierz folder z plikami");
     DirectoryChooser directoryChooser = new DirectoryChooser();
     directoryChooser.setTitle("Wybierz folder");
     directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
@@ -70,19 +73,22 @@ public class Controller {
   public void onClickGenerate() {
     Date date = new Date();
     SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
-    nameFile = "React-Client-" + formatter.format(date) +".csv";
+    nameFile = "KW-" + formatter.format(date) +".csv";
     try {
-      writer = new PrintWriter(nameFile, "UTF-8");
+      writer = new PrintWriter(nameFile, "CP1250");
+      writer.println(header);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
     search();
+    labelText.setText("Plik o nazwie : " + nameFile + " wygenerowany");
     writer.close();
   }
 
   public void search() {
+
     try (Stream<Path> walk = Files.walk(Paths.get(selectedDirectory.getAbsolutePath()))) {
       resultDirecotry = walk.filter(Files::isDirectory)
         .map(x -> x.toString()).collect(Collectors.toList());
@@ -90,7 +96,7 @@ public class Controller {
         try (Stream<Path> walkFile = Files.walk(Paths.get(x))) {
           resultFile = walkFile.map(y -> y.toString())
             .filter(f -> f.endsWith(".html")).collect(Collectors.toList());
-          read(resultFile);
+          read(resultFile, x);
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -100,7 +106,7 @@ public class Controller {
     }
   }
 
-  public void read(List<String> resultFile) throws IOException {
+  public void read(List<String> resultFile, String direcotry) throws IOException {
     KW kw = new KW();
     if (resultFile.size() == 6) {
       for (int i = 0; i < resultFile.size(); i++) {
@@ -113,40 +119,48 @@ public class Controller {
         }
         if (i == 1) {
           kw.setField3(csQuery.GetKWFields3(document));
+          kw.setField4(csQuery.GetKWFields4(document));
           kw.setField5(csQuery.GetKWFields5(document));
-          //kw.setField6(csQuery.GetKWFields6(document));
-          csQuery.GetKWFields6(document);
-          csQuery.GetKWFields7(document);
-          csQuery.GetKWFields8(document);
-          csQuery.GetKWFields15(document);
-          csQuery.GetKWFields14(document);
-          csQuery.GetKWFields13(document);
+          kw.setField6(csQuery.GetKWFields6(document));
+          kw.setField7(csQuery.GetKWFields7(document));
+          kw.setField8(csQuery.GetKWFields8(document));
+          kw.setField13(csQuery.GetKWFields13(document));
+          kw.setField15(csQuery.GetKWFields15(document));
+          kw.setField14(csQuery.GetKWFields14(document));
         }
         if(i == 2){
-          csQuery.GetKWFields11(document);
+          kw.setField11(csQuery.GetKWFields11(document));
         }
         if(i == 3){
-          csQuery.GetKWFields9(document);
-          csQuery.GetKWFields10(document);
+          kw.setField9(csQuery.GetKWFields9(document));
+          kw.setField10(csQuery.GetKWFields10(document));
         }
         if(i == 4){
-          csQuery.GetKWFields12(document);
+          kw.setField12(csQuery.GetKWFields12(document));
         }
       }
-      System.out.println("######################################################################");
-    } else {
-      System.out.println("**********************************************************************");
-      System.out.println("Za krotki");
-      System.out.println("**********************************************************************");
     }
-    writer.print(kw.getField1() + ";");
-    writer.print(kw.getField2() + ";");
-    writer.print(kw.getField3() + ";");
-    writer.println(kw.getField5() + ";");
-  }
-
-  public void write(String s){
-
+    if(kw.getField2() != null) {
+      writer.print(kw.getField1() + ";");
+      writer.print(kw.getField2() + ";");
+      writer.print("'" + kw.getField3() + ";");
+      writer.print(kw.getField4() + ";");
+      writer.print(kw.getField5() + ";");
+      writer.print(kw.getField6() + ";");
+      writer.print(kw.getField7() + ";");
+      writer.print(kw.getField8() + ";");
+      writer.print(kw.getField9() + ";");
+      writer.print(kw.getField10() + ";");
+      writer.print(kw.getField11() + ";");
+      writer.print(kw.getField12() + ";");
+      writer.print(kw.getField13() + ";");
+      writer.print(kw.getField14() + ";");
+      writer.println(kw.getField15() + ";");
+    }
+    else
+    {
+      writer.println(direcotry);
+    }
   }
 }
 
