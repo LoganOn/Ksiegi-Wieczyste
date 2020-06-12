@@ -108,7 +108,7 @@ public class Controller {
 
   public void read(List<String> resultFile, String direcotry) throws IOException {
     KW kw = new KW();
-    if (resultFile.size() == 6) {
+    if (resultFile.size() == 5) {
       for (int i = 0; i < resultFile.size(); i++) {
         fileTemp = new File(resultFile.get(i));
         document = Jsoup.parse(fileTemp, "UTF-8");

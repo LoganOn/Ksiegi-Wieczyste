@@ -24,7 +24,9 @@ public class CsQuery {
   }
 
   public Boolean setTable(Document document) {
-    this.tables = document.select("table");
+    this.tables = document.select("div");
+    this.tables = tables.select("table");
+ //   this.tables = document.select("table");
     if (tables.size() > 10) {
       this.table = document.select("table").get(tables.size() - 3);
       rows = table.select("tr");
@@ -39,7 +41,7 @@ public class CsQuery {
   }
 
   public String GetKWFields2(Document document) {
-    if (setTable(document, 3)) {
+    if (setTable(document, 2)) {
       for (int i = 0; i < rows.size(); i++) {
         cols = rows.get(i).select("td");
         if (cols.size() < 2)
@@ -54,9 +56,10 @@ public class CsQuery {
 
   public String GetKWFields3(Document document) {
     StringBuilder sb = new StringBuilder();
-    if (setTable(document, 6)) {
+    if (setTable(document, 5)) {
       for (int j = 0; j < rows.size(); j++) {
         cols = rows.get(j).select("td");
+        System.out.println(cols.toString());
         if (cols.get(0).text().equals("2. Numer działki")) {
           Elements temp = cols;
           int i = j;
@@ -83,13 +86,15 @@ public class CsQuery {
 
   public String GetKWFields4(Document document) {
     StringBuilder sb = new StringBuilder();
-    if (setTable(document, 6)) {
+    if (setTable(document, 5)) {
       for (int j = 0; j < rows.size(); j++) {
         cols = rows.get(j).select("td");
         if (cols.get(0).text().equals("8. Przyłączenie")) {
           Elements temp = rows.get(j + 1).select("td");
           if (!temp.get(temp.size() - 1).text().equals("/ /") && !temp.get(temp.size() - 1).hasClass("csMark") && !temp.get(temp.size() - 1).text().equals("---")) {
-            sb.append(temp.get(temp.size() - 1).text() + " ");
+            if(sb.length() > 0)
+              sb.append(", ");
+            sb.append(temp.get(temp.size() - 1).text());
           }
         }
       }
@@ -99,7 +104,7 @@ public class CsQuery {
   }
 
   public String GetKWFields5(Document document) {
-    if (setTable(document, 10)) {
+    if (setTable(document, 9)) {
       for (int j = 0; j < rows.size(); j++) {
         cols = rows.get(j).select("td");
         if (cols.get(cols.size() - 1).hasClass("csDane"))
@@ -112,7 +117,7 @@ public class CsQuery {
 
   public String GetKWFields6(Document document) {
     StringBuilder sb = new StringBuilder();
-    if (setTable(document, 5)) {
+    if (setTable(document, 4)) {
       for (int i = 0; i < rows.size(); i++) {
         cols = rows.get(i).select("td");
         if (i > 4 && (!cols.get(1).text().equals("1. Numer porządkowy"))) {
@@ -123,7 +128,7 @@ public class CsQuery {
           }
         }
       }
-      if (setTable(document, 6)) {
+      if (setTable(document, 5)) {
         for (int i = 0; i < rows.size(); i++) {
           cols = rows.get(i).select("td");
           if (cols.get(0).text().equals("5. Ulica") && !cols.get(cols.size() - 1).hasClass("csMark") && !cols.get(cols.size() - 1).text().equals("---")) {
@@ -150,7 +155,7 @@ public class CsQuery {
 
   public String GetKWFields7(Document document) {
     StringBuilder sb = new StringBuilder();
-    if (setTable(document, 6)) {
+    if (setTable(document, 5)) {
       for (int i = 0; i < rows.size(); i++) {
         cols = rows.get(i).select("td");
         if (cols.get(0).text().equals("6. Sposób korzystania") && !cols.get(cols.size() - 1).text().equals("---")) {
@@ -219,13 +224,17 @@ public class CsQuery {
         cols = rows.get(i).select("td");
         if (cols.get(cols.size() - 1).hasClass("csDane") && !cols.get(cols.size() - 1).text().equals("---") && !cols.get(cols.size() - 1).text().equals("/ /")) {
           if (cols.get(cols.size() - 1).text().length() > 1) {
+            if(sb.length() > 1)
+              sb.append(" ");
             if (cols.get(0).text().equals("6. Imię ojca")) {
               sb.append("Imię ojca : ");
             } else if (cols.get(0).text().equals("7. Imię matki")) {
-              sb.append(", Imię matki : ");
+              sb.append("Imię matki : ");
             }
-            sb.append((cols.get(cols.size() - 1).text()) + " ");
+            sb.append((cols.get(cols.size() - 1).text()));
           }
+          else if(cols.get(cols.size() - 1).text().length() == 1 && sb.length() > 1)
+            sb.append(",");
         }
       }
       return String.valueOf(sb).replace(";", ",");
